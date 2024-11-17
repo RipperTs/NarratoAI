@@ -257,11 +257,19 @@ class VideoProcessor:
             logger.info("步骤1: 压缩视频...")
             ffmpeg_cmd = [
                 'ffmpeg', '-i', self.video_path,
-                '-vf', f'scale={compressed_width}:-1',
+                '-vf', f'scale={compressed_width}:ceil(ih*{compressed_width}/iw/2)*2',
                 '-y',
                 compressed_video
             ]
-            subprocess.run(ffmpeg_cmd, check=True)
+            # 使用subprocess.run时捕获输出，以便在出错时提供更详细的信息
+            try:
+                result = subprocess.run(ffmpeg_cmd,
+                                        check=True,
+                                        capture_output=True,
+                                        text=True)
+            except subprocess.CalledProcessError as e:
+                logger.error(f"FFmpeg 错误输出: {e.stderr}")
+                raise
 
             # 2. 从压缩视频中提取关键帧
             logger.info("\n步骤2: 从压缩视频提取关键帧...")
@@ -331,7 +339,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    processor = VideoProcessor("best.mp4")
+    processor = VideoProcessor("/Users/wyf/Downloads/demo.mp4")
     processor.process_video_pipeline(output_dir="output4")
     end_time = time.time()
     print(f"处理完成！总耗时: {end_time - start_time:.2f} 秒")

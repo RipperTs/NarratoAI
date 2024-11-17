@@ -316,7 +316,6 @@ def generate_script(tr, params):
                 try:
                     # 确保目录存在
                     os.makedirs(video_keyframes_dir, exist_ok=True)
-                    
                     # 初始化视频处理器
                     if config.frames.get("version") == "v2":
                         processor = video_processor_v2.VideoProcessor(params.video_origin_path)
@@ -353,7 +352,7 @@ def generate_script(tr, params):
                     except Exception as cleanup_err:
                         logger.error(f"清理失败的关键帧目录时出错: {cleanup_err}")
                     
-                    raise Exception(f"关键帧提取��败: {str(e)}")
+                    raise Exception(f"关键帧提取失败: {str(e)}")
 
             # 根据不同的 LLM 提供商处理
             vision_llm_provider = st.session_state.get('vision_llm_providers').lower()
